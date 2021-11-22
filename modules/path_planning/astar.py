@@ -2,6 +2,7 @@ import math
 import queue
 import time
 import numpy as np
+import cv2
 
 ##################################################
 #
@@ -21,13 +22,17 @@ class SearchNode:
 
 class AStar:
 
-    def __init__(self,startPos,endPos,image):
+    def __init__(self,startPos,endPos,image,imageWindowName):
+        #startPos and endPos are tuples
+        #image is the numpy array from cv2
+        #imageWindowName is the name of the image to update for the visual results
+
         self.startPos = startPos
         self.endPos = endPos
         self.img = image
         self.imgWidth = len(image[0])
         self.imgHeight = len(image)
-
+        self.imgWindow = imageWindowName
 
     # This function returns the euclidean distance between two grid cells 
     def euclidean_distance_grid(self,a,b):
@@ -38,29 +43,28 @@ class AStar:
 
         neighbors = []
 
-        
-        #Four possible adjacent cells
+        #Calculate all the possible adjacent pixels
         adj = [(-1,0),(1,0),(0,-1),(0,1),
                 (-1,1),(1,1),(-1,-1),(1,-1)]
+
         for move in adj:
             #(x,y format)
             nextCell = (pos[0]+move[0],pos[1]+move[1])
 
+            #Make sure the pixel is a valid pixel inside the road
             if nextCell[0] >= self.imgWidth or nextCell[0] < 0 or nextCell[1] >= self.imgHeight or nextCell[1] < 0:
                 continue
-
             if nextCell in closed:
                 continue
-
             if np.array_equal(self.img[nextCell[1]][nextCell[0]],[0,0,0]):
                 continue
 
             neighbors.append(nextCell)
 
-
         return neighbors
 
     def run(self):
+        #Initializes and begins the a_star algorithm
 
         start_node = SearchNode(self.startPos,None,0)
         start_node.h = self.euclidean_distance_grid(self.startPos,self.endPos)
@@ -89,8 +93,8 @@ class AStar:
         return path
     
     def a_star(self,fringe):
+        #The A Star algorithm logic 
         #Fringe is the set of nodes that are open and can be evaluated
-
         closed = set() #The set of nodes already evaluated
         expansions = 0 #This keep track of the number of expansions
 
@@ -107,7 +111,9 @@ class AStar:
                     print('Found the goal after ', expansions, ' node expansions')
                     return expand_node
 
-                #img[expand_node.state[1]][expand_node.state[0]] = [0,255,0]
+                #Display the expanded node visually
+                self.img[expand_node.state[1]][expand_node.state[0]] = [0,255,0]
+
                 closed.add(expand_node.state)
                 neighbors = self.get_neighbors(expand_node.state,closed)
 
@@ -121,8 +127,9 @@ class AStar:
                     
                     priority = newNode.cost + newNode.h
                     fringe.put((priority,newNode))
-
-                # if expansions % 10000 == 0:
-                # 	cv2.imshow('image',img)
-                # 	cv2.waitKey(0)
+                
+                #Update the visual image as we expand nodes
+                if expansions % 100 == 0:
+                	cv2.imshow(self.imgWindow,self.img)
+                	cv2.waitKey(1)
 

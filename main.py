@@ -8,6 +8,7 @@ import time
 import random
 import math
 import os
+import copy
 from os.path import isfile,join
 
 #Global variables to store the mouse position coordinates from the image
@@ -35,13 +36,13 @@ def select_point(event,x,y,flags,param):
             selectStart = False
             startX,startY = ix,iy
             cv2.imshow('image',img)
-            cv2.waitKey(10)
+            cv2.waitKey(1)
         #Set the endPoint and begin path planning computation
         else:
             img = cv2.circle(img,(ix,iy),radius=5,color=(0,0,255),thickness=-1)
             endX,endY = ix,iy
             cv2.imshow('image',img)
-            cv2.waitKey(10)
+            cv2.waitKey(1)
 
             #Start the path planning algoirthm
             runPathPlanning()
@@ -50,9 +51,9 @@ def select_point(event,x,y,flags,param):
             #Resize the image if needed
             #img = cv2.resize(img,(1024,1024),interpolation=cv2.INTER_AREA)
             cv2.imshow('image',img)
-            cv2.waitKey(0)
+            selectStart = True
 
-        
+
 def grabRandomImage():
     #Returns an image path to use for the path processing
 
@@ -70,7 +71,7 @@ def runPathPlanning(algoName="astar"):
     if algoName == "astar":
 
         #Run the pathfinding algorithm
-        aStarAlgo = AStar(startPos,endPos,img)
+        aStarAlgo = AStar(startPos,endPos,copy.deepcopy(img),"image")
         path = aStarAlgo.run()
     #else algoName == "LPA":
     #Future path finding algorithms go here..each should return a list of coordinates
@@ -92,8 +93,6 @@ def runPathPlanning(algoName="astar"):
     print('Quality/Cost of solution: ', solution_quality)
     print("Time took: ",duration)
     
-
-
 
 def main():
     global img 
