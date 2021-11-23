@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 class BFS:
 
@@ -18,18 +19,21 @@ class BFS:
         self.visited = set()
 
     def run(self):
-
+        
+        expansions = 0
         stack = []
         stack.append((self.startPos,[]))
         self.visited.add(self.startPos)
 
         while len(stack) > 0:
+            expansions += 1
 
             nextItem = stack.pop(0)
             currPath = nextItem[1]
             currPos = nextItem[0]
 
             if currPos == self.endPos:
+                print('Found the goal after ',expansions, ' node expansions')
                 return currPath + [currPos]      
 
 
@@ -51,4 +55,9 @@ class BFS:
                 
                 self.visited.add(nextCell)
                 stack.append((nextCell,currPath + [currPos]))
+
+            self.img[currPos[1]][currPos[0]] = [0,255,0]
+            if expansions % 100 == 0:
+                cv2.imshow(self.imgWindow,self.img)
+                cv2.waitKey(1)
 
