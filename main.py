@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 from modules.path_planning.astar import AStar
 from modules.path_planning.BFS import BFS
+from modules.path_planning.greedyBestFirst import greedyBestFirst
 import time
 import random
 import math
@@ -63,7 +64,7 @@ def grabRandomImage():
 
     return join(imgFolder,random.choice(imgs))
 
-def runPathPlanning(algoName="bfs"):
+def runPathPlanning(algoName="greedyBestFirst"):
     
     start = time.time()
     startPos = (startX,startY)
@@ -79,6 +80,11 @@ def runPathPlanning(algoName="bfs"):
     elif algoName == "bfs":
         bfsAlgo = BFS(startPos,endPos,copy.deepcopy(img),"image")
         path = bfsAlgo.run()
+    
+    elif algoName == "greedyBestFirst":
+        greedyBestFirstAlgo = greedyBestFirst(startPos,endPos,copy.deepcopy(img),"image")
+        path = greedyBestFirstAlgo.run()
+
 
     else:
         print("No valid algorithm found for the algorithm name given...exiting")
