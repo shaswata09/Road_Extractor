@@ -6,6 +6,7 @@ import cv2
 from modules.path_planning.astar import AStar
 from modules.path_planning.BFS import BFS
 from modules.path_planning.greedyBestFirst import greedyBestFirst
+from modules.path_planning.bidirectDijkstras import BiDirectionalDijkstra
 import time
 import random
 import math
@@ -64,7 +65,7 @@ def grabRandomImage():
 
     return join(imgFolder,random.choice(imgs))
 
-def runPathPlanning(algoName="greedyBestFirst"):
+def runPathPlanning(algoName="bidirectDijkstras"):
     
     start = time.time()
     startPos = (startX,startY)
@@ -84,7 +85,9 @@ def runPathPlanning(algoName="greedyBestFirst"):
     elif algoName == "greedyBestFirst":
         greedyBestFirstAlgo = greedyBestFirst(startPos,endPos,copy.deepcopy(img),"image")
         path = greedyBestFirstAlgo.run()
-
+    elif algoName == "bidirectDijkstras":
+        bidirectDijk = BiDirectionalDijkstra(startPos,endPos,copy.deepcopy(img),"image")
+        path = bidirectDijk.run()
 
     else:
         print("No valid algorithm found for the algorithm name given...exiting")
